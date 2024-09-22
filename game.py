@@ -2,13 +2,13 @@ import pygame as pg
 from time import sleep
 from gamemech import GameMech
 from player1 import Player
-from wall import Wall
-from dirt import Dirt
-from grass import Grass
-from dirt_hole import DirtHole
-from obstacle import Obstacle
-from tent import Tent
-from water import Water
+from Objects.wall import Wall
+from Objects.dirt import Dirt
+from Objects.grass import Grass
+from Objects.dirt_hole import DirtHole
+from Objects.obstacle import Obstacle
+from Objects.tent import Tent
+from Objects.water import Water
 
 
 class Game(object):
