@@ -1,5 +1,5 @@
 import pygame as pg
-from stub.client_stub import ClientStub
+from gamemech import GameMech
 from ui import UP, DOWN, LEFT, RIGHT, PLAYER_KEYS, PLAYER_REVERSE_KEYS
 
 
@@ -71,11 +71,11 @@ class Player(pg.sprite.DirtySprite):
         """
         return self.my_id
 
-    def update(self, cs: ClientStub) -> str | None:
+    def update(self, gm: GameMech) -> str | None:
         """Função que processa uma ação do jogador
 
-        :param cs: stub do cliente
-        :type cs: ClientStub
+        :param gm: Mecânicas do Jogo
+        :type gm: GameMech
         :return: None ou o nome do item encontrado num buraco de terra
         :rtype: str | None
         """
@@ -86,7 +86,7 @@ class Player(pg.sprite.DirtySprite):
         # Andar para a esquerda
         if key[self.keys[0]]:
             # Nova posição do jogador
-            new_pos = cs.step(self.my_id, LEFT)
+            new_pos = gm.execute(self.my_id, LEFT)
             # Nova direção do jogador
             self.direction = LEFT
             # Novo sprite do jogador
@@ -97,7 +97,7 @@ class Player(pg.sprite.DirtySprite):
         # Andar para a direita
         elif key[self.keys[1]]:
             # Nova posição do jogador
-            new_pos = cs.step(self.my_id, RIGHT)
+            new_pos = gm.execute(self.my_id, RIGHT)
             # Nova direção do jogador
             self.direction = RIGHT
             # Novo sprite do jogador
@@ -108,7 +108,7 @@ class Player(pg.sprite.DirtySprite):
         # Andar para cima
         elif key[self.keys[2]]:
             # Nova posição do jogador
-            new_pos = cs.step(self.my_id, UP)
+            new_pos = gm.execute(self.my_id, UP)
             # Nova direção do jogador
             self.direction = UP
             # Novo sprite do jogador
@@ -119,7 +119,7 @@ class Player(pg.sprite.DirtySprite):
         # Andar para baixo
         elif key[self.keys[3]]:
             # Nova posição do jogador
-            new_pos = cs.step(self.my_id, DOWN)
+            new_pos = gm.execute(self.my_id, DOWN)
             # Nova direção do jogador
             self.direction = DOWN
             # Novo sprite do jogador
@@ -130,7 +130,7 @@ class Player(pg.sprite.DirtySprite):
         # Escavar um buraco
         elif key[self.keys[4]]:
             # Verifica se encontrou algo
-            item_found: str | None = cs.dig_hole(self.my_id)
+            item_found: str | None = gm.dig(self.my_id)
             # Se encontrou um item
             if item_found is not None:
                 # Se encontrou uma caveira reverte os controlos
