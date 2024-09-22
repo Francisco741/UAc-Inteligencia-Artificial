@@ -1,33 +1,31 @@
-# Informação da conexão
-PORT = 35000
-SERVER_ADDRESS = "localhost"
-
-# Operações de comunicação
-COMMAND_SIZE = 9
-INT_SIZE = 8
-MAX_STR_SIZE = 20  # Número máximo de caracteres do nome do jogador
-NR_CLIENTS = 2  # Número de jogadores
-MAP_OP = "get map  "
-MUSIC_OP = "get music"
-PLAYER_OP = "player   "
-START_GAME = "game     "
-UPDATE_WORLD = "upd world"
-GET_OBJTS = "get objts"
-STEP_OP = "step     "
-DIG_OP = "dig      "
-END_GAME = "end game "
-BYE_OP = "bye      "
-STOP_SERVER_OP = "stop    "
-
-# Registo do servidor
-LOG_FILENAME = "server.log"
-LOG_LEVEL = 1
+from pygame import K_LEFT, K_RIGHT, K_UP, K_DOWN, K_SPACE, K_a, K_d, K_w, K_s, K_TAB
 
 # Constantes
 UP = 0
 RIGHT = 1
 DOWN = 2
 LEFT = 3
+SQUARE_SIZE = 50
+
+# Constantes não utilizadas
+MAX_STR_SIZE = 20  # Número máximo de caracteres do nome do jogador
+NR_CLIENTS = 2  # Número de jogadores
+
+# Controlos do Jogador
+PLAYER_KEYS: dict[int, tuple[int, int, int, int, int]] = {
+    0: (K_LEFT, K_RIGHT, K_UP, K_DOWN, K_SPACE),
+    1: (K_a, K_d, K_w, K_s, K_TAB),
+    # 2: (pg.K_j, pg.K_l, pg.K_i, pg.K_k, pg.K_SPACE),
+    # 3: (pg.K_KP4, pg.K_KP6, pg.K_KP8, pg.K_KP5, pg.K_KP_ENTER),
+}
+
+# Controlos do Jogador revertidos
+PLAYER_REVERSE_KEYS: dict[int, tuple[int, int, int, int, int]] = {
+    0: (K_RIGHT, K_LEFT, K_DOWN, K_UP, K_SPACE),
+    1: (K_d, K_a, K_s, K_w, K_TAB),
+    # 2: (pg.K_l, pg.K_j, pg.K_k, pg.K_i, pg.K_SPACE),
+    # 3: (pg.K_KP6, pg.K_KP4, pg.K_KP5, pg.K_KP8, pg.K_KP_ENTER),
+}
 
 # Mapas do Jogo
 """

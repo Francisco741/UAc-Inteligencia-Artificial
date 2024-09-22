@@ -2,8 +2,15 @@
 
 ## Controlos
 
+### Jogador 1
+
 **Andar**: Setas do teclado\
 **Escavar**: Barra de espaço
+
+### Jogador 2
+
+**Andar**: WASD\
+**Escavar**: Tab
 
 ## Itens
 

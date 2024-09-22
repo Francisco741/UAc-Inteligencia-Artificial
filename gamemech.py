@@ -1,5 +1,5 @@
 from random import shuffle
-from server_impl import UP, RIGHT, DOWN, LEFT
+from constants import UP, RIGHT, DOWN, LEFT
 
 
 class GameMech:

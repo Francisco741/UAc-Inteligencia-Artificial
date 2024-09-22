@@ -1,7 +1,2 @@
 .idea
-client/stub/__pycache__
-client/ui/__pycache__
-middleware/socket_impl/__pycache__
-server/server_impl/__pycache__
-server/skeleton/__pycache__
-server/server.log
+__pycache__

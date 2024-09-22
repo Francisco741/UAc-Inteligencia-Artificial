@@ -1,6 +1,6 @@
 import pygame as pg
 from gamemech import GameMech
-from ui import UP, DOWN, LEFT, RIGHT, PLAYER_KEYS, PLAYER_REVERSE_KEYS
+from constants import UP, DOWN, LEFT, RIGHT, PLAYER_KEYS, PLAYER_REVERSE_KEYS
 
 
 class Player(pg.sprite.DirtySprite):
@@ -37,7 +37,7 @@ class Player(pg.sprite.DirtySprite):
         # Pontuação do jogador
         self.points: int = points
         # Controlos do jogador
-        self.keys: tuple[int, int, int, int, int] = PLAYER_KEYS
+        self.keys: tuple[int, int, int, int, int] = PLAYER_KEYS[self.my_id]
         # Direção do jogador
         self.direction = DOWN
         # Tamanho do jogador
@@ -221,8 +221,8 @@ class Player(pg.sprite.DirtySprite):
 
     def reverse_keys(self) -> None:
         """Função que reverte os controlos do jogador"""
-        self.keys = PLAYER_REVERSE_KEYS
+        self.keys = PLAYER_REVERSE_KEYS[self.my_id]
 
     def fix_keys(self) -> None:
-        """Função que tráz os controlos do jogador de volta à normalidade"""
-        self.keys = PLAYER_KEYS
+        """Função que traz os controlos do jogador de volta à normalidade"""
+        self.keys = PLAYER_KEYS[self.my_id]

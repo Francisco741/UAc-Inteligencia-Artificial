@@ -1,5 +1,6 @@
 import pygame as pg
 from time import sleep
+from gamemech import GameMech
 from player1 import Player
 from wall import Wall
 from dirt import Dirt
@@ -8,7 +9,6 @@ from dirt_hole import DirtHole
 from obstacle import Obstacle
 from tent import Tent
 from water import Water
-from gamemech import GameMech
 
 
 class Game(object):
@@ -59,8 +59,10 @@ class Game(object):
         pg.mixer_music.play(-1)
         # Relógio do jogo
         self.clock: pg.time.Clock = pg.time.Clock()
-        # Id do jogador
-        self.id: int = 0
+        # Número de Jogadores
+        self.nr_players: int = 2
+        # Grupo com os jogadores no jogo
+        self.players = pg.sprite.LayeredDirty()
         # Update ao display
         pg.display.update()
 
@@ -138,20 +140,16 @@ class Game(object):
         :param size: Tamanho do sprite do jogador
         :type size: int
         """
-        # Grupo com os jogadores no jogo
-        self.players = pg.sprite.LayeredDirty()
         # Pede ao utilizador o seu nome de jogador
         name: str = str(input("Insira o seu nome (máximo 20 caracteres): "))
         # Pede o nome novamente se ultrapassar o limite de caracteres
         while len(name) > 20:
             name: str = str(input("Nome demasiado grande. Insira um novo nome: "))
         # Adiciona o jogador ao jogo
-        (self.id, pos) = self.gm.add_player(name)
-        print("Player ", name, " created with id: ", self.id)
-        self.player1: Player = Player(
-            self.id, name, pos[0], pos[1], size, 0, self.players
-        )
-        self.players.add(self.player1)
+        (id, pos) = self.gm.add_player(name)
+        print("Player ", name, " created with id: ", id)
+        new_player: Player = Player(id, name, pos[0], pos[1], size, 0, self.players)
+        self.players.add(new_player)
 
     def create_map_objects(self, size: int) -> None:
         """Função para criar objetos do mundo
@@ -296,8 +294,9 @@ class Game(object):
         self.get_dirt_holes(self.grid_size)
         # Desenha os sprites dos pedaços de terra escaváveis
         self.dirt_holes.draw(self.screen)
-        # Cria o jogador
-        self.create_player(self.grid_size)
+        # Cria os jogadores
+        for _ in range(self.nr_players):
+            self.create_player(self.grid_size)
         # Variável que sinaliza se o jogo terminou ou não
         end: bool = False
         # Loop do jogo que corre enquanto não terminar
@@ -310,21 +309,22 @@ class Game(object):
                     end = True
                 if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     end = True
-            # Faz update da posição do jogador e se este escavou um buraco retorna o item escavado
-            item: str | None = self.player1.update(self.gm)
-            # Atualiza a pontuação do jogador conforme o item escavado
-            if item == "bone":
-                self.player1.points += 10
-            elif item == "diamond":
-                self.player1.points += 50
-            elif item == "fish":
-                self.player1.points += 5
-            elif item == "coin":
-                self.player1.points += 20
-            elif item == "chalice":
-                self.player1.points += 30
-            elif item == "crown":
-                self.player1.points += 40
+            # Faz update da posição dos jogadores e se estes escavaram um buraco retorna o item escavado
+            for player in self.players:
+                item: str | None = player.update(self.gm)
+                # Atualiza a pontuação do jogador conforme o item escavado
+                if item == "bone":
+                    player.points += 10
+                elif item == "diamond":
+                    player.points += 50
+                elif item == "fish":
+                    player.points += 5
+                elif item == "coin":
+                    player.points += 20
+                elif item == "chalice":
+                    player.points += 30
+                elif item == "crown":
+                    player.points += 40
             # Faz update do mundo
             self.update_world()
             # Desenha os sprites dos pedaços de terra escaváveis novamente
