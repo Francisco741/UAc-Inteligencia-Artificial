@@ -105,6 +105,14 @@ class GameMech:
             (self.nr_max_x - 2, self.nr_max_y - 2),
         ]
 
+    def get_world(self) -> dict:
+        """Função que retorna o mundo do jogo
+
+        :return: mundo do jogo
+        :rtype: dict
+        """
+        return self.world
+
     def get_map(self) -> list[list[int]]:
         """Função que retorna o mapa do jogo
 

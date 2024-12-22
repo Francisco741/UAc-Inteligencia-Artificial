@@ -2,6 +2,7 @@ import pygame as pg
 from time import sleep
 from gamemech import GameMech
 from player1 import Player
+from player2 import PlayerAI
 from Objects.wall import Wall
 from Objects.dirt import Dirt
 from Objects.grass import Grass
@@ -12,7 +13,14 @@ from Objects.water import Water
 
 
 class Game(object):
-    def __init__(self, gm: GameMech, size: int = 50) -> None:
+    def __init__(
+        self,
+        gm: GameMech,
+        size: int = 50,
+        player1_type: str = "Jogador",
+        player2_type: str = "Jogador",
+        ai_speed: int = 5,
+    ) -> None:
         """Classe com toda a parte visual do jogo
 
         :param gm: Mecânicas do Jogo
@@ -38,31 +46,48 @@ class Game(object):
         self.background: pg.Surface = self.background.convert()
         self.background.fill((56, 136, 48))
         self.screen.blit(self.background, (0, 0))
-        # Fonte usada na mensagem de espera
-        self.font: pg.font.Font = pg.font.Font("Other/PressStart2P-Regular.ttf", 28)
-        # Mensagem de espera pelo oponente
-        waiting_message = self.font.render(
-            "Insirem os seus nomes", True, (255, 255, 255)
-        )
-        self.screen.blit(waiting_message, (80, 300, self.width, self.height + 40))
-        # Tamanho da grelha do jogo
-        self.grid_size: int = size
-        # Desenha a grelha do jogo (desativada por questões de estética)
-        # self.draw_grid(self.width, self.height, self.grid_size, (153, 135, 64))
-        # Fonte usada no GUI
-        self.font: pg.font.Font = pg.font.Font("Other/PressStart2P-Regular.ttf", 13)
         # Música selecionada
         self.music: int = self.gm.get_music()
         # Música do jogo
         pg.mixer_music.load(f"Music/main_song{self.music}.mp3")
         pg.mixer_music.set_volume(0.4)
         pg.mixer_music.play(-1)
+        # Fonte usada na mensagem inicial
+        self.font: pg.font.Font = pg.font.Font("Other/PressStart2P-Regular.ttf", 28)
+        # Mensagem de inicio de jogo
+        self.screen.fill((56, 136, 48))  # Replace with your background color
+        waiting_message = self.font.render("Ready?", True, (255, 255, 255))
+        self.screen.blit(waiting_message, (380, 300))  # Only (x, y)
+        pg.display.update()
+        sleep(1)
+        # Mensagem 2 de inicio de jogo
+        self.screen.fill((56, 136, 48))  # Replace with your background color
+        waiting_message2 = self.font.render("Go!", True, (255, 255, 255))
+        self.screen.blit(waiting_message2, (420, 300))  # Only (x, y)
+        pg.display.update()
+        sleep(1)
+        # Tamanho da grelha do jogo
+        self.grid_size: int = size
+        # Desenha a grelha do jogo (desativada por questões de estética)
+        # self.draw_grid(self.width, self.height, self.grid_size, (153, 135, 64))
+        # Fonte usada no GUI
+        self.font: pg.font.Font = pg.font.Font("Other/PressStart2P-Regular.ttf", 13)
         # Relógio do jogo
         self.clock: pg.time.Clock = pg.time.Clock()
-        # Número de Jogadores
-        self.nr_players: int = 2
+        # Tipo do Jogador 1
+        self.player1_type: str = player1_type
+        # Tipo do Jogador 2
+        self.player2_type: str = player2_type
+        # Velocidade de decisão da AI
+        self.ai_speed: int = ai_speed
         # Grupo com os jogadores no jogo
         self.players = pg.sprite.LayeredDirty()
+        # Grupo com os jogadores AI no jogo
+        self.players_ai = pg.sprite.LayeredDirty()
+        # Verdadeiro se existir um humano
+        self.human_player_exists = False
+        # Verdadeiro se existir uma ai
+        self.ai_player_exists = False
         # Update ao display
         pg.display.update()
 
@@ -76,6 +101,13 @@ class Game(object):
         for player in self.players:
             player_points: pg.Surface = self.font.render(
                 f"{player.name}: {player.points}", True, (255, 255, 255)
+            )
+            self.screen.blit(player_points, (space, self.height + 15))
+            space += 400
+        # Escreve os nomes dos jogadores AI no GUI e a sua pontuação
+        for player_ai in self.players_ai:
+            player_points: pg.Surface = self.font.render(
+                f"{player_ai.name}: {player_ai.points}", True, (255, 255, 255)
             )
             self.screen.blit(player_points, (space, self.height + 15))
             space += 400
@@ -140,16 +172,37 @@ class Game(object):
         :param size: Tamanho do sprite do jogador
         :type size: int
         """
-        # Pede ao utilizador o seu nome de jogador
-        name: str = str(input("Insira o seu nome (máximo 20 caracteres): "))
-        # Pede o nome novamente se ultrapassar o limite de caracteres
-        while len(name) > 20:
-            name: str = str(input("Nome demasiado grande. Insira um novo nome: "))
+        # Nome de jogador
+        if not self.human_player_exists:
+            name = "Human"
+        else:
+            name = "Human 2"
         # Adiciona o jogador ao jogo
         (id, pos) = self.gm.add_player(name)
         print("Player ", name, " created with id: ", id)
         new_player: Player = Player(id, name, pos[0], pos[1], size, 0, self.players)
         self.players.add(new_player)
+        self.human_player_exists = True
+
+    def create_player_ai(self, size: int, algorithm: int) -> None:
+        """Função para criar um jogador AI
+
+        :param size: Tamanho do sprite do jogador AI
+        :type size: int
+        """
+        # Nome do jogador AI
+        if not self.ai_player_exists:
+            name = "AI"
+        else:
+            name = "AI 2"
+        # Adiciona o jogador AI ao jogo
+        (id, pos) = self.gm.add_player(name)
+        print("Player ", name, " created with id: ", id)
+        new_player_ai: PlayerAI = PlayerAI(
+            id, name, pos[0], pos[1], size, 0, algorithm, self.players_ai
+        )
+        self.players_ai.add(new_player_ai)
+        self.ai_player_exists = True
 
     def create_map_objects(self, size: int) -> None:
         """Função para criar objetos do mundo
@@ -294,9 +347,21 @@ class Game(object):
         self.get_dirt_holes(self.grid_size)
         # Desenha os sprites dos pedaços de terra escaváveis
         self.dirt_holes.draw(self.screen)
-        # Cria os jogadores
-        for _ in range(self.nr_players):
+        # Cria o jogador 1
+        if self.player1_type == "Jogador":
             self.create_player(self.grid_size)
+        elif self.player1_type == "A*  Tipo 1":
+            self.create_player_ai(self.grid_size, 1)
+        else:
+            self.create_player_ai(self.grid_size, 2)
+        # Cria o jogador 2
+        if self.player2_type == "Jogador":
+            self.create_player(self.grid_size)
+        elif self.player2_type == "A*  Tipo 1":
+            self.create_player_ai(self.grid_size, 1)
+        else:
+            self.create_player_ai(self.grid_size, 2)
+        ai_turn = self.ai_speed
         # Variável que sinaliza se o jogo terminou ou não
         end: bool = False
         # Loop do jogo que corre enquanto não terminar
@@ -325,6 +390,33 @@ class Game(object):
                     player.points += 30
                 elif item == "crown":
                     player.points += 40
+            ai_turn -= 1
+            if ai_turn <= 0:
+                ai_turn = self.ai_speed
+                # Faz update da posição dos jogadores ai e se estes escavaram um buraco retorna o item escavado
+                for player_ai in self.players_ai:
+                    item: str | None = player_ai.update(self.gm, False)
+                    # Atualiza a pontuação do jogador ai conforme o item escavado
+                    if item == "bone":
+                        player_ai.points += 10
+                    elif item == "diamond":
+                        player_ai.points += 50
+                    elif item == "fish":
+                        player_ai.points += 5
+                    elif item == "coin":
+                        player_ai.points += 20
+                    elif item == "chalice":
+                        player_ai.points += 30
+                    elif item == "crown":
+                        player_ai.points += 40
+                    elif item == "skull":
+                        ai_turn = 30
+                    elif item == "potion":
+                        ai_turn = 0
+            else:
+                # jogador AI fica parado
+                for player_ai in self.players_ai:
+                    player_ai.update(self.gm, True)
             # Faz update do mundo
             self.update_world()
             # Desenha os sprites dos pedaços de terra escaváveis novamente
@@ -333,6 +425,8 @@ class Game(object):
             self.dirts.draw(self.screen)
             # Desenha os sprites dos jogadores novamente
             self.players.draw(self.screen)
+            # Desenha os sprites dos jogadores ai novamente
+            self.players_ai.draw(self.screen)
             # Desenha a grelha novamente
             # self.draw_grid(self.width, self.height, self.grid_size, (153, 135, 64))
             # Desenha e atualiza o GUI
