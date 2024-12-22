@@ -4,13 +4,13 @@
 
 ### Jogador 1
 
-**Andar**: Setas do teclado\
+**Andar**: WASD\
 **Escavar**: Barra de espaço
 
 ### Jogador 2
 
-**Andar**: WASD\
-**Escavar**: Tab
+**Andar**: Setas do teclado\
+**Escavar**: Enter Numpad
 
 ## Itens
 
